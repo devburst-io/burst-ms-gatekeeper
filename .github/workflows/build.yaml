@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     uses: keinou/github-actions/.github/workflows/build-and-push-node-app.yaml@main
+    secrets:
+      discordWebhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
     permissions:
       contents: read
       packages: write

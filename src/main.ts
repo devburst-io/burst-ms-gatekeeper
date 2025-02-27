@@ -1,11 +1,12 @@
 import { LoggerMiddleware, Proto } from '@devburst-io/burst-lib-commons';
 import { ReflectionService } from '@grpc/reflection';
-import { LogLevel, Logger, ValidationPipe } from '@nestjs/common';
+import { LogLevel, Logger, ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { useContainer } from 'class-validator';
 
 declare const module: any;
 
@@ -33,6 +34,7 @@ async function bootstrap() {
   );
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   // OpenApi
   const configSwagger = new DocumentBuilder()

@@ -37,17 +37,18 @@ export class OrganizationService {
   }
 
   async findOne(id: string): Promise<Organization> {
-    const monitor = await this.organizationRepository
-      .createQueryBuilder()
-      .select()
-      .where("Organization.id = :id", { id })
+    const organization = await this.organizationRepository
+      .createQueryBuilder('organization')
+      .leftJoinAndSelect('organization.members', 'members')
+      .leftJoinAndSelect('members.user', 'user')
+      .where("organization.id = :id", { id })
       .getOne()
 
-    if (!monitor) {
+    if (!organization) {
       throw new NotFoundException(`Organization with ID ${id} not found`);
     }
 
-    return monitor;
+    return organization;
   }
 
   async getUserOrganizations(user: User, page, pageSize) {
