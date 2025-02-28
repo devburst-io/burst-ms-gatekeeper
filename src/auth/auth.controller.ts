@@ -52,7 +52,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Token refreshed successfully' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
-  @UseGuards(AuthGuard('jwt-refresh'))
+  //@UseGuards(AuthGuard('jwt-refresh'))
   @HttpCode(HttpStatus.CREATED)
   async refreshToken(@Request() req): Promise<any> {
     return this.authService.refreshToken(req.user.sessionId, req.user);
