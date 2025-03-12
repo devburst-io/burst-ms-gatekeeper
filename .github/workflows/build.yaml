@@ -13,10 +13,31 @@ on:
 jobs:
   build:
     uses: keinou/github-actions/.github/workflows/build-and-push-node-app.yaml@main
-    secrets:
-      discordWebhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
     permissions:
       contents: read
       packages: write
       attestations: write
       id-token: write
+
+  deploy:
+    uses: keinou/github-actions/.github/workflows/deploy-on-private-zt-docker.yaml@main
+    needs: build
+    secrets:
+      HOST: sv.karc.io
+      PORT: "22"
+      USERNAME: ${{ secrets.HOST_USERNAME }}
+      PASSWORD: ${{ secrets.HOST_PASSWORD }}
+      ZEROTIER_API_TOKEN: ${{ secrets.ZEROTIER_API_TOKEN }}
+      ZEROTIER_NETWORK_ID: ${{ secrets.ZEROTIER_NETWORK_ID }}
+    with:
+      command: |
+        cd sentinel
+        docker compose up -d
+
+  notification:
+    if: always()
+    name: Notification
+    uses: keinou/github-actions/.github/workflows/notification.yaml@main
+    needs: ["build", "deploy"]
+    secrets:
+      webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

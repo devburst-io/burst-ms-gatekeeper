@@ -1,6 +1,6 @@
 import { CryptoHelper, PaginetedResponse, Role } from '@devburst-io/burst-lib-commons';
 import { MailerService } from '@nestjs-modules/mailer';
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import generator from 'generate-password-ts';
@@ -86,7 +86,7 @@ export class UserService {
         }
       }
       Logger.error(e);
-      throw new BadRequestException("Vefify the data sent");
+      throw e;
     }
   }
 
