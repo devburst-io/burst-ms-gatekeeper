@@ -1,6 +1,6 @@
 import { CryptoHelper, PaginetedResponse, Role } from '@devburst-io/burst-lib-commons';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import generator from 'generate-password-ts';
@@ -8,6 +8,8 @@ import { ForgotPasswordDto } from 'src/auth/dto/forgot-password.dto';
 import { OrganizationService } from 'src/organization/organization.service';
 import { ObjectLiteral, QueryFailedError, Repository } from 'typeorm';
 import { User } from './entity/user.entity';
+import { JwtService } from '@nestjs/jwt';
+import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
 
 @Injectable()
 export class UserService {
@@ -19,7 +21,8 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
-    private readonly organizationService: OrganizationService
+    private readonly organizationService: OrganizationService,
+    private readonly jwtService: JwtService
   ) {
     this.cryptoHelper = new CryptoHelper({ configService })
   }
@@ -90,57 +93,61 @@ export class UserService {
     }
   }
 
-  async resetPassword(userId: string, user: Partial<User>): Promise<Partial<User>> {
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
     try {
-      user.password = this.cryptoHelper.decryptData(user.password);
-      const resp = await this.userRepository.findOne({ where: { id: userId } });
-      if (!resp) {
-        throw new NotFoundException('User not found');
+      const payload = this.jwtService.verify(resetPasswordDto.token, {
+        secret: this.configService.get<string>('JWT_RESET_SECRET', 'super-secret'),
+      });
+
+      const user = await this.userRepository.findOne({ where: { id: payload.userId } });
+      if (!user) {
+        throw new BadRequestException('Token inválido');
       }
 
-      resp.password = user.password;
-      const updatedUser = await this.userRepository.save(resp);
-      return { ...updatedUser, password: undefined }
-    } catch (e) {
-      Logger.error(e);
-      throw e;
+      const hashedPassword = await this.cryptoHelper.encryptData(resetPasswordDto.newPassword);
+      user.password = hashedPassword;
+      const updatedUser = await this.userRepository.save(user);
+      return { ...updatedUser, password: undefined };
+    } catch (error) {
+      throw new BadRequestException('Token inválido ou expirado');
     }
   }
 
-  async forgotPassword(dto: ForgotPasswordDto): Promise<Partial<User>> {
-    try {
-      const user = await this.userRepository.findOne(
-        {
-          where: [
-            { email: dto.email }
-          ]
-        }
-      );
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const user = await this.userRepository.findOne({ where: { email: forgotPasswordDto.email } });
+    if (!user) {
+      return;
+    }
 
-      if (!user) {
-        throw new NotFoundException('User not found');
+    const token = this.jwtService.sign(
+      { userId: user.id },
+      { 
+        secret: this.configService.get<string>('JWT_RESET_SECRET', 'super-secret'),
+        expiresIn: '2h'
       }
+    );
 
-      const password = generator.generate({
-        length: 15,
-        numbers: true
+    const resetLink = `${this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000')}/reset-password?token=${token}`;
+
+    try {
+      console.log('Tentando enviar email para:', user.email);
+      console.log('Reset link:', resetLink);
+      
+      const mail = await this.mailerService.sendMail({
+        to: user.email,
+        from: this.configService.get<string>('SMTP_USER', ''),
+        subject: 'Redefinição de Senha',
+        template: 'reset-password',
+        context: {
+          name: user.name,
+          resetLink,
+        },
       });
 
-      user.password = password
-
-      this.mailerService
-        .sendMail({
-          to: user.email,
-          from: 'rafael@karc.io',
-          subject: 'Password Reset',
-          html: `<b>Your new password is ${password} </b>`,
-        }).catch((e) => { Logger.error(`Mailer => ${e}`) });
-
-      const updatedUser = await this.userRepository.save(user)
-      return { ...updatedUser, password: undefined }
-    } catch (e) {
-      Logger.error(e);
-      throw e;
+      console.log('Email enviado:', mail);
+    } catch (error) {
+      console.error('Erro ao enviar email:', error);
+      throw error;
     }
   }
 }

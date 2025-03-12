@@ -14,6 +14,8 @@ import { Session } from './session/entity/session.entity';
 import { SessionModule } from './session/session.module';
 import { User } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
+import { MailModule } from './mail/mail.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -59,7 +61,7 @@ import { UserModule } from './user/user.module';
           from: '"Burst Gatekeeper" <>',
         },
         template: {
-          dir: __dirname + '/templates',
+          dir: join(__dirname, 'mail/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
@@ -75,7 +77,8 @@ import { UserModule } from './user/user.module';
     UserModule,
     OrganizationModule,
     SessionModule,
-    HealthModule
+    HealthModule,
+    MailModule,
   ],
   controllers: [],
   providers: [],

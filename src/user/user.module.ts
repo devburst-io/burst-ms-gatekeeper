@@ -11,6 +11,7 @@ import { Session } from 'src/session/entity/session.entity';
 import { User } from './entity/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -33,12 +34,20 @@ import { UserService } from './user.service';
         }
       ]
     }),
-    OrganizationModule
+    OrganizationModule,
+    JwtModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_RESET_SECRET', 'super-secret'),
+        signOptions: { expiresIn: '2h' },
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [UserController],
   providers: [
     UserService,
     OrganizationService,
   ],
+  exports: [UserService],
 })
 export class UserModule { }

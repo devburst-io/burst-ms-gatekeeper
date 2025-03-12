@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { JwtResponseDto } from './dto/jwt-response.dto';
 import { LoginDto } from './dto/login.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -37,14 +38,13 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  @ApiOperation({ summary: 'Reset password' })
-  @ApiBody({ type: LoginDto })
+  @ApiOperation({ summary: 'Reset password using token' })
+  @ApiBody({ type: ResetPasswordDto })
   @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Password reset successful' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid token or password' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid or expired token' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(CustomGuard)
-  async resetPassword(@Request() req, @Body() resetPasswordDto: LoginDto) {
-    return this.userService.resetPassword(req.user.id, resetPasswordDto);
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    await this.userService.resetPassword(resetPasswordDto);
   }
 
   @Post('refresh')
