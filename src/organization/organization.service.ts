@@ -8,6 +8,7 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { Organization } from './entities/organization.entity';
 import { OrganizationMember } from './entities/organization.member.entity';
+import { ApiNoContentResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class OrganizationService {
@@ -182,6 +183,8 @@ export class OrganizationService {
       throw new ForbiddenException('Cannot remove the last owner of the organization');
     }
 
-    return this.memberRepository.remove(membershipToRemove);
+    await this.memberRepository.remove(membershipToRemove);
+
+    return ApiNoContentResponse();
   }
 }
