@@ -10,6 +10,7 @@ import { ObjectLiteral, QueryFailedError, Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,8 @@ export class UserService {
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
     private readonly organizationService: OrganizationService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {
     this.cryptoHelper = new CryptoHelper({ configService })
   }
@@ -80,6 +82,9 @@ export class UserService {
       const userEntity = this.userRepository.create(user);
       const res = await this.userRepository.save(userEntity);
       const userSaved = { ...res, password: undefined };
+
+      // Enviar email de boas-vindas
+      await this.mailService.sendWelcomeEmail(userSaved.email, userSaved.name);
 
       return userSaved;
     } catch (e) {

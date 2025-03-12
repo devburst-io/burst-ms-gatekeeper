@@ -12,6 +12,7 @@ import { User } from './entity/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { JwtModule } from '@nestjs/jwt';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { JwtModule } from '@nestjs/jwt';
       }),
       inject: [ConfigService],
     }),
+    MailModule,
   ],
   controllers: [UserController],
   providers: [

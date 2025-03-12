@@ -20,6 +20,7 @@ import { UserService } from "src/user/user.service";
 import { AuthController } from "./auth.controller";
 import { AuthGrpcController } from "./auth.grpc.controller";
 import { AuthService } from "./auth.service";
+import { MailModule } from "src/mail/mail.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuthService } from "./auth.service";
     PassportModule,
     SessionModule,
     OrganizationModule,
+    MailModule,
     TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember]),
     ClientsModule.registerAsync({
       clients: [
