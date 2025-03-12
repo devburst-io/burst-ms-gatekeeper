@@ -154,4 +154,8 @@ export class AuthService {
       tokenExpires,
     };
   }
+
+  async logout(sessionId: string): Promise<void> {
+    await this.sessionService.delete(sessionId);
+  }
 }

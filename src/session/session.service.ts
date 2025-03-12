@@ -30,5 +30,7 @@ export class SessionService {
     return await this.findById(id);
   }
 
-
+  async delete(id: Session['id']): Promise<void> {
+    await this.sessionRepository.delete(id);
+  }
 }

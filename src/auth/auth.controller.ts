@@ -1,7 +1,6 @@
-import { AuthGuard as CustomGuard } from '@devburst-io/burst-lib-commons';
+import { AuthGuard, AuthGuard as CustomGuard } from '@devburst-io/burst-lib-commons';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/guards/local-auth.guard';
 import { UserService } from 'src/user/user.service';
@@ -56,6 +55,15 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async refreshToken(@Request() req): Promise<any> {
     return this.authService.refreshToken(req.user.sessionId, req.user);
+  }
+
+  @Post('logout')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Logout user' })
+  @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Logout successful' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Request() req) {
+    await this.authService.logout(req.user.sessionId);
   }
 
   @Get('config/pub')
