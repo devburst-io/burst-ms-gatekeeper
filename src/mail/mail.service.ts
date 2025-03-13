@@ -3,6 +3,14 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { welcomeTemplate } from './templates/welcome.template';
 
+interface SendOrganizationInviteParams {
+  email: string;
+  name?: string;
+  organizationName: string;
+  inviteLink: string;
+  inviterName: string;
+}
+
 @Injectable()
 export class MailService {
   constructor(
@@ -23,5 +31,23 @@ export class MailService {
     console.log('Email enviado:', mail);
 
     return mail;
+  }
+
+  async sendOrganizationInvite(params: SendOrganizationInviteParams) {
+    const { email, name, organizationName, inviteLink, inviterName } = params;
+    const from = this.configService.get<string>('SMTP_USER', '');
+
+    await this.mailerService.sendMail({
+      to: email,
+      from,
+      subject: `Convite para participar da organização ${organizationName}`,
+      template: 'organization-invite',
+      context: {
+        name: name || email,
+        organizationName,
+        inviteLink,
+        inviterName
+      }
+    });
   }
 } 

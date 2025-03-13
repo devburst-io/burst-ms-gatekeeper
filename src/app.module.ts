@@ -16,6 +16,7 @@ import { User } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 import { join } from 'path';
+import { OrganizationInvitation } from './organization/entities/organization-invitation.entity';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { join } from 'path';
         password: configService.get<string>('DB_PASS', 'postgres'),
         database: configService.get<string>('DB_DATABASE', 'burst_gatekeeper'),
         synchronize: true,
-        entities: [User, Session, Organization, OrganizationMember]
+        entities: [User, Session, Organization, OrganizationMember, OrganizationInvitation]
       }),
       inject: [ConfigService]
     }),

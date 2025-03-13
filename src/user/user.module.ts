@@ -6,18 +6,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Organization } from 'src/organization/entities/organization.entity';
 import { OrganizationMember } from 'src/organization/entities/organization.member.entity';
 import { OrganizationModule } from 'src/organization/organization.module';
-import { OrganizationService } from 'src/organization/organization.service';
 import { Session } from 'src/session/entity/session.entity';
 import { User } from './entity/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from '../mail/mail.module';
+import { OrganizationInvitation } from '../organization/entities/organization-invitation.entity';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember]),
+    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember, OrganizationInvitation]),
     ClientsModule.registerAsync({
       clients: [
         {
@@ -48,7 +48,6 @@ import { MailModule } from '../mail/mail.module';
   controllers: [UserController],
   providers: [
     UserService,
-    OrganizationService,
   ],
   exports: [UserService],
 })

@@ -11,6 +11,7 @@ import { User } from './entity/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
 import { MailService } from 'src/mail/mail.service';
+import { OrganizationInvitation } from 'src/organization/entities/organization-invitation.entity';
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,8 @@ export class UserService {
     private readonly organizationService: OrganizationService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    @InjectRepository(OrganizationInvitation)
+    private readonly invitationRepository: Repository<OrganizationInvitation>,
   ) {
     this.cryptoHelper = new CryptoHelper({ configService })
   }
@@ -85,6 +88,26 @@ export class UserService {
 
       // Enviar email de boas-vindas
       await this.mailService.sendWelcomeEmail(userSaved.email, userSaved.name);
+
+      // Verifica convites pendentes
+      const pendingInvitations = await this.invitationRepository.find({
+        where: {
+          email: user.email,
+          accepted: false
+        },
+        relations: ['organization']
+      });
+
+      // Adiciona o usuário às organizações dos convites pendentes
+      for (const invitation of pendingInvitations) {
+        await this.organizationService.addMemberDirectly(
+          invitation.organizationId,
+          userSaved.id
+        );
+        
+        invitation.accepted = true;
+        await this.invitationRepository.save(invitation);
+      }
 
       return userSaved;
     } catch (e) {

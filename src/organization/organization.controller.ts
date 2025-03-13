@@ -92,4 +92,17 @@ export class OrganizationController {
     return this.organizationService.removeMember(organizationId, memberId, req.user);
   }
 
+  @Post('invitations/accept')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Aceitar convite para organização' })
+  @ApiResponse({ status: 200, description: 'Convite aceito com sucesso' })
+  @ApiResponse({ status: 400, description: 'Token inválido ou expirado' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  async acceptInvitation(
+    @Body('token') token: string,
+    @Request() req
+  ) {
+    return this.organizationService.acceptInvitation(token, req.user);
+  }
+
 }

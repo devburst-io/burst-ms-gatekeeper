@@ -21,6 +21,7 @@ import { AuthController } from "./auth.controller";
 import { AuthGrpcController } from "./auth.grpc.controller";
 import { AuthService } from "./auth.service";
 import { MailModule } from "src/mail/mail.module";
+import { OrganizationInvitation } from "src/organization/entities/organization-invitation.entity";
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { MailModule } from "src/mail/mail.module";
     SessionModule,
     OrganizationModule,
     MailModule,
-    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember]),
+    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember, OrganizationInvitation]),
     ClientsModule.registerAsync({
       clients: [
         {

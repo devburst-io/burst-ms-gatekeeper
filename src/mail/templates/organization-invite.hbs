@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Convite para Organização</h2>
+    
+    <p>Olá {{name}},</p>
+    
+    <p>{{inviterName}} convidou você para participar da organização <strong>{{organizationName}}</strong>.</p>
+    
+    <p>Para aceitar o convite, clique no botão abaixo:</p>
+    
+    <a href="{{inviteLink}}" class="button">Aceitar Convite</a>
+    
+    <p>Se você não conhece o remetente ou não esperava este convite, pode ignorar este email.</p>
+    
+    <div class="footer">
+      <p>Este link expirará em 7 dias.</p>
+      <p>Se o botão não funcionar, copie e cole este link no seu navegador:</p>
+      <p>{{inviteLink}}</p>
+    </div>
+  </div>
+</body>
+</html> 

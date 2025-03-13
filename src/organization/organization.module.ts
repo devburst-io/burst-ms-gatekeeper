@@ -9,11 +9,16 @@ import { OrganizationController } from './organization.controller';
 import { OrganizationGrpcController } from './organization.grpc.controller';
 import { OrganizationService } from './organization.service';
 import { Proto } from '@devburst-io/burst-lib-commons';
+import { OrganizationInvitation } from './entities/organization-invitation.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Organization, OrganizationMember, User]),
+    JwtModule,
+    MailModule,
+    TypeOrmModule.forFeature([Organization, OrganizationMember, User, OrganizationInvitation]),
     ClientsModule.registerAsync({
       clients: [
         {
@@ -34,5 +39,6 @@ import { Proto } from '@devburst-io/burst-lib-commons';
   ],
   controllers: [OrganizationController, OrganizationGrpcController],
   providers: [OrganizationService],
+  exports: [OrganizationService]
 })
 export class OrganizationModule { }
