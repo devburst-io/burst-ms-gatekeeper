@@ -12,13 +12,14 @@ import { Proto } from '@devburst-io/burst-lib-commons';
 import { OrganizationInvitation } from './entities/organization-invitation.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from 'src/mail/mail.module';
+import { OrganizationImage } from './entities/organization-image.entity';
 
 @Module({
   imports: [
     ConfigModule,
     JwtModule,
     MailModule,
-    TypeOrmModule.forFeature([Organization, OrganizationMember, User, OrganizationInvitation]),
+    TypeOrmModule.forFeature([Organization, OrganizationMember, User, OrganizationInvitation, OrganizationImage]),
     ClientsModule.registerAsync({
       clients: [
         {

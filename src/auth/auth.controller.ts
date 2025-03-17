@@ -1,8 +1,9 @@
-import { AuthGuard, AuthGuard as CustomGuard } from '@devburst-io/burst-lib-commons';
+import { AuthGuard as CustomGuard } from '@devburst-io/burst-lib-commons';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from 'src/guards/local-auth.guard';
+import { JwtRefreshGuard } from 'src/guards/jwt-refresh.guard';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -48,17 +49,16 @@ export class AuthController {
 
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh token for a session' })
-  @ApiBody({ type: LoginDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Token refreshed successfully' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
-  //@UseGuards(AuthGuard('jwt-refresh'))
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Token inválido ou expirado' })
+  @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.CREATED)
   async refreshToken(@Request() req): Promise<any> {
-    return this.authService.refreshToken(req.user.sessionId, req.user);
+    return this.authService.refreshToken(req.sessionId, req.user);
   }
 
   @Post('logout')
-  @UseGuards(AuthGuard)
+  @UseGuards(CustomGuard)
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Logout successful' })
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -75,7 +75,6 @@ export class AuthController {
   async loggedIn(data: any) {
     try {
       const res = await this.authService.validateToken(data.jwt);
-
       return res;
     } catch (error) {
       throw error;

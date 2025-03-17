@@ -22,6 +22,8 @@ import { AuthGrpcController } from "./auth.grpc.controller";
 import { AuthService } from "./auth.service";
 import { MailModule } from "src/mail/mail.module";
 import { OrganizationInvitation } from "src/organization/entities/organization-invitation.entity";
+import { OrganizationImage } from "src/organization/entities/organization-image.entity";
+import { JwtRefreshGuard } from '../guards/jwt-refresh.guard';
 
 @Module({
   imports: [
@@ -31,7 +33,7 @@ import { OrganizationInvitation } from "src/organization/entities/organization-i
     SessionModule,
     OrganizationModule,
     MailModule,
-    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember, OrganizationInvitation]),
+    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember, OrganizationInvitation, OrganizationImage]),
     ClientsModule.registerAsync({
       clients: [
         {
@@ -52,10 +54,10 @@ import { OrganizationInvitation } from "src/organization/entities/organization-i
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET', 'super-secret'),
+        secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES', '2h')
-        }
+          expiresIn: configService.get<string>('JWT_EXPIRATION', '15m'),
+        },
       }),
       inject: [ConfigService],
     })],
@@ -69,7 +71,10 @@ import { OrganizationInvitation } from "src/organization/entities/organization-i
     JwtRefreshStrategy,
     UserService,
     SessionService,
-    OrganizationService
+    OrganizationService,
+    JwtRefreshGuard,
+    ConfigService
   ],
+  exports: [AuthService],
 })
 export class AuthModule { }

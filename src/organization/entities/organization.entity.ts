@@ -23,6 +23,12 @@ export class Organization implements OrganizationInterface {
   })
   description: string
 
+  @Column({ nullable: true })
+  @ApiResponseProperty({
+    type: String,
+  })
+  imageId: string;
+
   @OneToMany(() => OrganizationMember, member => member.organization)
   @ApiResponseProperty({
     type: [OrganizationMember]

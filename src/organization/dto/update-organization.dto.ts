@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString, IsUrl } from "class-validator";
 
 export class UpdateOrganizationDto {
   @IsOptional()
@@ -8,4 +8,9 @@ export class UpdateOrganizationDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsUrl()
+  imageUrl?: string;
 }

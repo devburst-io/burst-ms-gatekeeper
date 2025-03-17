@@ -13,6 +13,9 @@ import { OrganizationInvitation } from './entities/organization-invitation.entit
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '@nestjs/config';
+import * as fs from 'fs';
+import * as path from 'path';
+import { OrganizationImage } from './entities/organization-image.entity';
 
 @Injectable()
 export class OrganizationService {
@@ -25,6 +28,8 @@ export class OrganizationService {
     private userRepository: Repository<User>,
     @InjectRepository(OrganizationInvitation)
     private invitationRepository: Repository<OrganizationInvitation>,
+    @InjectRepository(OrganizationImage)
+    private imageRepository: Repository<OrganizationImage>,
     private jwtService: JwtService,
     private mailService: MailService,
     private configService: ConfigService,
@@ -276,5 +281,59 @@ export class OrganizationService {
     });
     
     return this.memberRepository.save(membership);
+  }
+
+  async uploadImage(id: string, file: Express.Multer.File, requestingUser: User) {
+    const organization = await this.findOne(id);
+    const membership = await this.memberRepository.findOne({
+      where: {
+        organization: { id },
+        user: { id: requestingUser.id }
+      }
+    });
+
+    if (!membership || membership.role !== OrganizationRole.Owner) {
+      throw new ForbiddenException('Apenas proprietários da organização podem atualizar a imagem');
+    }
+
+    if (!file) {
+      throw new BadRequestException('Nenhum arquivo foi enviado');
+    }
+
+    const existingImage = await this.imageRepository.findOne({
+      where: { organizationId: id }
+    });
+
+    if (existingImage) {
+      existingImage.filename = file.originalname;
+      existingImage.mimetype = file.mimetype;
+      existingImage.data = file.buffer;
+      await this.imageRepository.save(existingImage);
+    } else {
+      const newImage = this.imageRepository.create({
+        filename: file.originalname,
+        mimetype: file.mimetype,
+        data: file.buffer,
+        organizationId: id
+      });
+      await this.imageRepository.save(newImage);
+    }
+
+    organization.imageId = id;
+    await this.organizationRepository.save(organization);
+
+    return { id };
+  }
+
+  async getImage(id: string): Promise<OrganizationImage> {
+    const image = await this.imageRepository.findOne({
+      where: { organizationId: id }
+    });
+
+    if (!image) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    return image;
   }
 }

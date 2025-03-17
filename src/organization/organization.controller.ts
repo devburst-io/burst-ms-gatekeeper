@@ -1,6 +1,8 @@
 import { AuthGuard } from '@devburst-io/burst-lib-commons';
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Request, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Request, UseGuards, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import { AddMemberDto } from './dto/add-member.dto';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -9,7 +11,6 @@ import { OrganizationService } from './organization.service';
 @ApiTags('organizations')
 @ApiBearerAuth()
 @Controller('organization')
-
 export class OrganizationController {
   constructor(private readonly organizationService: OrganizationService) { }
 
@@ -105,4 +106,31 @@ export class OrganizationController {
     return this.organizationService.acceptInvitation(token, req.user);
   }
 
+  @Get(':id/image')
+  @ApiOperation({ summary: 'Obter imagem da organização' })
+  @ApiParam({ name: 'id', description: 'ID da Organização' })
+  @ApiResponse({ status: 200, description: 'Imagem encontrada' })
+  @ApiResponse({ status: 404, description: 'Imagem não encontrada' })
+  async getImage(@Param('id') id: string, @Res() res: Response) {
+    const image = await this.organizationService.getImage(id);
+    res.setHeader('Content-Type', image.mimetype);
+    res.send(image.data);
+  }
+
+  @Post(':id/image')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Fazer upload de imagem da organização' })
+  @ApiConsumes('multipart/form-data')
+  @ApiParam({ name: 'id', description: 'ID da Organização' })
+  @ApiResponse({ status: 200, description: 'Imagem atualizada com sucesso' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 404, description: 'Organização não encontrada' })
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req
+  ) {
+    return this.organizationService.uploadImage(id, file, req.user);
+  }
 }
