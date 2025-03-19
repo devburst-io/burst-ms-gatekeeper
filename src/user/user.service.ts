@@ -126,6 +126,7 @@ export class UserService {
       const payload = this.jwtService.verify(resetPasswordDto.token, {
         secret: this.configService.get<string>('JWT_RESET_SECRET', 'super-secret'),
       });
+      resetPasswordDto.newPassword = this.cryptoHelper.decryptData(resetPasswordDto.newPassword);
 
       const user = await this.userRepository.findOne({ where: { id: payload.userId } });
       if (!user) {
