@@ -132,9 +132,8 @@ export class UserService {
       if (!user) {
         throw new BadRequestException('Token inválido');
       }
+      user.password = resetPasswordDto.newPassword;
 
-      const hashedPassword = await this.cryptoHelper.encryptData(resetPasswordDto.newPassword);
-      user.password = hashedPassword;
       const updatedUser = await this.userRepository.save(user);
       return { ...updatedUser, password: undefined };
     } catch (error) {
