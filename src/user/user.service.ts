@@ -12,6 +12,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
 import { MailService } from 'src/mail/mail.service';
 import { OrganizationInvitation } from 'src/organization/entities/organization-invitation.entity';
+import { hash } from 'bcrypt';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
+import { addHours } from 'date-fns';
 
 @Injectable()
 export class UserService {
@@ -21,6 +24,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(PasswordResetToken)
+    private readonly resetTokenRepository: Repository<PasswordResetToken>,
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
     private readonly organizationService: OrganizationService,
@@ -123,21 +128,46 @@ export class UserService {
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     try {
-      const payload = this.jwtService.verify(resetPasswordDto.token, {
-        secret: this.configService.get<string>('JWT_RESET_SECRET', 'super-secret'),
+      const resetToken = await this.resetTokenRepository.findOne({
+        where: {
+          token: resetPasswordDto.token,
+          used: false
+        },
+        relations: ['user']
       });
-      resetPasswordDto.newPassword = this.cryptoHelper.decryptData(resetPasswordDto.newPassword);
 
-      const user = await this.userRepository.findOne({ where: { id: payload.userId } });
-      if (!user) {
-        throw new BadRequestException('Token inválido');
+      if (!resetToken) {
+        throw new BadRequestException('Token inválido ou já utilizado');
       }
-      user.password = resetPasswordDto.newPassword;
 
-      const updatedUser = await this.userRepository.save(user);
+      if (new Date() > resetToken.expiresAt) {
+        throw new BadRequestException('Token expirado');
+      }
+
+      const existingUser = await this.userRepository.findOne(
+        {
+          where: [
+            { email: resetToken.user.email }
+          ]
+        }
+      );
+
+      const decryptedPassword = this.cryptoHelper.decryptData(resetPasswordDto.newPassword);
+      existingUser.password = decryptedPassword;
+
+      // Marca o token como usado
+      resetToken.used = true;
+
+      // Salva as alterações
+      await this.resetTokenRepository.save(resetToken);
+      const updatedUser = await this.userRepository.save(existingUser);
+
       return { ...updatedUser, password: undefined };
     } catch (error) {
-      throw new BadRequestException('Token inválido ou expirado');
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Erro ao resetar a senha');
     }
   }
 
@@ -147,19 +177,28 @@ export class UserService {
       return;
     }
 
+    // Gera um token único
     const token = this.jwtService.sign(
-      { userId: user.id },
+      { type: 'password_reset' },
       { 
         secret: this.configService.get<string>('JWT_RESET_SECRET', 'super-secret'),
         expiresIn: '2h'
       }
     );
 
+    // Salva o token no banco
+    const resetToken = this.resetTokenRepository.create({
+      token,
+      userId: user.id,
+      expiresAt: addHours(new Date(), 2)
+    });
+    await this.resetTokenRepository.save(resetToken);
+
     const resetLink = `${this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000')}/reset-password?token=${token}`;
 
     try {
-      console.log('Tentando enviar email para:', user.email);
-      console.log('Reset link:', resetLink);
+      Logger.log('Tentando enviar email para:', user.email);
+      Logger.log('Reset link:', resetLink);
       
       const mail = await this.mailerService.sendMail({
         to: user.email,
@@ -172,9 +211,9 @@ export class UserService {
         },
       });
 
-      console.log('Email enviado:', mail);
+      Logger.log('Email enviado:', mail);
     } catch (error) {
-      console.error('Erro ao enviar email:', error);
+      Logger.error('Erro ao enviar email:', error);
       throw error;
     }
   }

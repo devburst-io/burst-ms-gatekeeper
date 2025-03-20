@@ -18,6 +18,7 @@ import { MailModule } from './mail/mail.module';
 import { join } from 'path';
 import { OrganizationInvitation } from './organization/entities/organization-invitation.entity';
 import { OrganizationImage } from './organization/entities/organization-image.entity';
+import { PasswordResetToken } from './user/entities/password-reset-token.entity';
 
 @Module({
   imports: [
@@ -42,7 +43,15 @@ import { OrganizationImage } from './organization/entities/organization-image.en
         password: configService.get<string>('DB_PASS', 'postgres'),
         database: configService.get<string>('DB_DATABASE', 'burst_gatekeeper'),
         synchronize: true,
-        entities: [User, Session, Organization, OrganizationMember, OrganizationInvitation, OrganizationImage]
+        entities: [
+          User,
+          Session,
+          Organization,
+          OrganizationMember,
+          OrganizationInvitation,
+          OrganizationImage,
+          PasswordResetToken
+        ]
       }),
       inject: [ConfigService]
     }),

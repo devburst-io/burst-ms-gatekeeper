@@ -13,11 +13,12 @@ import { UserService } from './user.service';
 import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from '../mail/mail.module';
 import { OrganizationInvitation } from '../organization/entities/organization-invitation.entity';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember, OrganizationInvitation]),
+    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember, OrganizationInvitation, PasswordResetToken]),
     ClientsModule.registerAsync({
       clients: [
         {

@@ -24,6 +24,7 @@ import { MailModule } from "src/mail/mail.module";
 import { OrganizationInvitation } from "src/organization/entities/organization-invitation.entity";
 import { OrganizationImage } from "src/organization/entities/organization-image.entity";
 import { JwtRefreshGuard } from '../guards/jwt-refresh.guard';
+import { PasswordResetToken } from "src/user/entities/password-reset-token.entity";
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { JwtRefreshGuard } from '../guards/jwt-refresh.guard';
     SessionModule,
     OrganizationModule,
     MailModule,
-    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember, OrganizationInvitation, OrganizationImage]),
+    TypeOrmModule.forFeature([User, Session, Organization, OrganizationMember, OrganizationInvitation, OrganizationImage, PasswordResetToken]),
     ClientsModule.registerAsync({
       clients: [
         {
