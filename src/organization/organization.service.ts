@@ -267,7 +267,7 @@ export class OrganizationService {
       invitation.accepted = true;
       await this.invitationRepository.save(invitation);
 
-      return { message: 'Convite aceito com sucesso' };
+      return ApiNoContentResponse();
     } catch (error) {
       throw new BadRequestException('Token inválido ou expirado');
     }

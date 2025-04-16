@@ -96,7 +96,7 @@ export class OrganizationController {
   @Post('invitations/accept')
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Aceitar convite para organização' })
-  @ApiResponse({ status: 200, description: 'Convite aceito com sucesso' })
+  @ApiResponse({ status: 204, description: 'Convite aceito com sucesso' })
   @ApiResponse({ status: 400, description: 'Token inválido ou expirado' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   async acceptInvitation(
