@@ -395,7 +395,7 @@
 
 "@devburst-io/burst-lib-commons@^0.1.8":
   version "0.1.8"
-  resolved "https://npm.pkg.github.com/download/@devburst-io/burst-lib-commons/0.1.8/9f04906c86e6a6837a10d50a3c51c6c5a2b5a86d#9f04906c86e6a6837a10d50a3c51c6c5a2b5a86d"
+  resolved "https://npm.pkg.github.com/download/@devburst-io/burst-lib-commons/0.1.8/9f04906c86e6a6837a10d50a3c51c6c5a2b5a86d"
   integrity sha512-9lPhgOGSWeZ4YeE4KPbI4UudXr+rj02H9UOE9HgUuLqf3fQYqyR9dpztmom2t4DMrEZbkBe5Lde4Vt1Wxj9GIA==
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
