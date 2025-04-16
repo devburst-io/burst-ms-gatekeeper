@@ -15,6 +15,7 @@ async function bootstrap() {
   const config = app.get<ConfigService>(ConfigService);
   const port = config.get<number>('PORT', 3000);
   const tcpPort = config.get<number>('GRPC_PORT', 5000);
+  const grpcHost = config.get<string>('GRPC_HOST', '0.0.0.0');
 
   const logLevel = config.get<string>('LOG_LEVEL', 'log');
   Logger.overrideLogger(getLogLevels(logLevel));
@@ -25,7 +26,7 @@ async function bootstrap() {
     options: {
       package: ['auth', 'organization'],
       protoPath: Proto.configFilePath,
-      url: `0.0.0.0:${tcpPort}`,
+      url: `${grpcHost}:${tcpPort}`,
       onLoadPackageDefinition: (pkg, server) => {
         new ReflectionService(pkg).addToServer(server);
       },
