@@ -49,5 +49,6 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
     CMD node -e "try { require('http').get('http://localhost:3000/health', (r) => r.statusCode === 200 ? process.exit(0) : process.exit(1)); } catch (e) { process.exit(1); }"
 
 EXPOSE 3000
+EXPOSE 5000
 
 ENTRYPOINT ["node", "dist/main.js"]
