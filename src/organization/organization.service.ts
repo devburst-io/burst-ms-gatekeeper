@@ -223,7 +223,7 @@ export class OrganizationService {
 
     await this.memberRepository.remove(membershipToRemove);
 
-    return ApiNoContentResponse();
+    return
   }
 
   async isUserAdmin(organizationId: string, userId: string): Promise<boolean> {
@@ -267,7 +267,7 @@ export class OrganizationService {
       invitation.accepted = true;
       await this.invitationRepository.save(invitation);
 
-      return ApiNoContentResponse();
+      return;
     } catch (error) {
       throw new BadRequestException('Token inválido ou expirado');
     }

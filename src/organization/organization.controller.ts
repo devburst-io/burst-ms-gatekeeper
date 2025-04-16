@@ -1,6 +1,6 @@
 import { AuthGuard } from '@devburst-io/burst-lib-commons';
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Request, UseGuards, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiConsumes } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Request, UseGuards, UseInterceptors, UploadedFile, Res, HttpCode } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiConsumes, ApiNoContentResponse } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { AddMemberDto } from './dto/add-member.dto';
@@ -78,11 +78,12 @@ export class OrganizationController {
   }
 
   @Delete(':id/members/:memberId')
+  @HttpCode(204)
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Remove member from organization' })
   @ApiParam({ name: 'id', description: 'Organization ID' })
   @ApiParam({ name: 'memberId', description: 'Member ID to remove' })
-  @ApiResponse({ status: 200, description: 'Member removed successfully' })
+  @ApiResponse({ status: 204, description: 'Member removed successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Organization or member not found' })
   removeMember(
@@ -94,9 +95,10 @@ export class OrganizationController {
   }
 
   @Post('invitations/accept')
+  @HttpCode(204)
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Aceitar convite para organização' })
-  @ApiResponse({ status: 204, description: 'Convite aceito com sucesso' })
+  @ApiNoContentResponse()
   @ApiResponse({ status: 400, description: 'Token inválido ou expirado' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   async acceptInvitation(
