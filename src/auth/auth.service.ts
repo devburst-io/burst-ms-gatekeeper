@@ -95,6 +95,7 @@ export class AuthService {
       throw new UnauthorizedException();
 
     const user = await this.userService.findOne(data.email);
+    const user_data = { ...user, password: undefined };
 
     if (user.id !== session.user.id)
       throw new UnauthorizedException();
@@ -111,7 +112,7 @@ export class AuthService {
       refreshToken,
       token,
       tokenExpires,
-      data,
+      data: user_data,
     };
 
   }
