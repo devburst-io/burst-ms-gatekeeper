@@ -44,7 +44,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, configSwagger);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('/auth/docs', app, document);
 
   await app.startAllMicroservices();
   await app.listen(port);
