@@ -35,7 +35,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'The user has been successfully created.', type: User })
   @ApiResponse({ status: 409, description: 'Email already exists' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
-  create(@Body() user: Partial<User>) {
+  create(@Body() user: CreateUserDto) {
     return this.userService.create(user);
   }
 
