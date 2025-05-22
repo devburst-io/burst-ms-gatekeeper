@@ -353,10 +353,10 @@
     "@css-inline/css-inline-linux-x64-musl" "0.14.1"
     "@css-inline/css-inline-win32-x64-msvc" "0.14.1"
 
-"@devburst-io/burst-lib-commons@0.1.9":
-  version "0.1.9"
-  resolved "https://npm.pkg.github.com/download/@devburst-io/burst-lib-commons/0.1.9/db1e7f7325f08e79c6159eea6faee335e7f13e1f"
-  integrity sha512-l2Xxe/1N9aW3piM4m0iL66QzZzmUiElZeTnfc1PTX+2u0CtXwiDFBHkPfl0GXYAORpIm4Uh2iiuAqTodd1qoyg==
+"@devburst-io/burst-lib-commons@0.1.10":
+  version "0.1.10"
+  resolved "https://npm.pkg.github.com/download/@devburst-io/burst-lib-commons/0.1.10/1a6b43173dab3271370241881e2797cbacf1e143"
+  integrity sha512-0kBWoAZQRDwqLBPkmnf8LLjznQl8995E+CpUSv2swEfyH0F2hKft9VrW/JjBv6mtfdmcaRQsFGPaSrXu8r9ENg==
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
   version "4.4.1"

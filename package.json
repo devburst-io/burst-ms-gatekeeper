@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@devburst-io/burst-lib-commons": "0.1.9",
+    "@devburst-io/burst-lib-commons": "0.1.10",
     "@grpc/grpc-js": "^1.12.6",
     "@grpc/proto-loader": "^0.7.13",
     "@grpc/reflection": "^1.0.4",
