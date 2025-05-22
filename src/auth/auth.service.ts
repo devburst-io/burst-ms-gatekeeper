@@ -40,6 +40,10 @@ export class AuthService {
     }
   }
 
+  async getUser(id: string) {
+    return await this.userService.findOneById(id);
+  }
+
   async login(user) {
     const data = { ...user, password: undefined };
     const { createHash } = await import('node:crypto');

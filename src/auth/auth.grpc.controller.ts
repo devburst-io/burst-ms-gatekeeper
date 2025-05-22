@@ -20,4 +20,10 @@ export class AuthGrpcController {
   healthCheck({ service }: { service: string }) {
     return { status: 'up' };
   }
+
+  @GrpcMethod('User', 'GetById')
+  async getUser(data: { id: string }) {
+    const res = await this.authService.getUser(data.id);
+    return res || {};
+  }
 }

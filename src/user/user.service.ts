@@ -72,6 +72,11 @@ export class UserService {
     return user;
   }
 
+  async findOneById(id: string): Promise<Partial<User>> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    return user;
+  }
+
   async create(user: Partial<User>): Promise<ObjectLiteral> {
     try {
       user.password = this.cryptoHelper.decryptData(user.password);
