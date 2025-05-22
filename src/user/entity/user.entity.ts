@@ -1,7 +1,7 @@
 import { Role, UserInterface } from "@devburst-io/burst-lib-commons";
 import { ApiResponseProperty } from "@nestjs/swagger";
 import { hash } from "bcrypt";
-import { Exclude } from "class-transformer";
+import { Exclude, Transform } from "class-transformer";
 import { IsEmail, Min } from "class-validator";
 import { Organization } from "src/organization/entities/organization.entity";
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
@@ -37,15 +37,24 @@ export class User implements UserInterface {
   @Column({ type: 'enum', enum: Role, default: Role.Common })
   role: Role;
 
-  @ApiResponseProperty()
+  @ApiResponseProperty({
+    type: Date,
+    example: '2023-01-01T00:00:00Z',
+  })
   @CreateDateColumn()
   createdAt: Date;
 
-  @ApiResponseProperty()
+  @ApiResponseProperty({
+    type: Date,
+    example: '2023-01-01T00:00:00Z',
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ApiResponseProperty()
+  @ApiResponseProperty({
+    type: Date,
+    example: '2023-01-01T00:00:00Z',
+  })
   @DeleteDateColumn()
   deletedAt: Date;
 
@@ -59,5 +68,4 @@ export class User implements UserInterface {
   async hashPassword() {
     this.password = await hash(this.password, 10);
   }
-
 }

@@ -73,7 +73,11 @@ export class UserService {
   }
 
   async findOneById(id: string): Promise<Partial<User>> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository
+      .createQueryBuilder()
+      .where("User.id = :id", { id })
+      .getOne();
+
     return user;
   }
 
