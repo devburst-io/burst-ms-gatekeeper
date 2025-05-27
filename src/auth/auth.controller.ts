@@ -25,7 +25,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Login successful', type: JwtResponseDto })
   async login(@Request() req) {
-    return this.authService.login(req.user, req.headers['user-agent'], req.headers['X-Real-IP']);
+    return this.authService.login(req.user, req.headers['user-agent'], req.headers['x-real-ip']);
   }
 
   @Post('forgot-password')
@@ -54,7 +54,7 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.CREATED)
   async refreshToken(@Request() req): Promise<any> {
-    return this.authService.refreshToken(req.sessionId, req.user, req.headers['user-agent'], req.headers['X-Real-IP']);
+    return this.authService.refreshToken(req.sessionId, req.user, req.headers['user-agent'], req.headers['x-real-ip']);
   }
 
   @Post('logout')
