@@ -44,7 +44,7 @@ export class AuthService {
     return await this.userService.findOneById(id);
   }
 
-  async login(user) {
+  async login(user, userAgent, host) {
     const data = { ...user, password: undefined };
     const { createHash } = await import('node:crypto');
     const hash = createHash('sha256')
@@ -52,10 +52,14 @@ export class AuthService {
       .digest('hex');
 
     try {
-      const session = await this.sessionService.create({
-        user,
-        hash,
-      });
+      const session = await this.sessionService.create(
+        {
+          user: user,
+          hash: hash,
+        },
+        userAgent,
+        host
+      );
 
       const { token, refreshToken, tokenExpires } = await this.getTokensData({
         user: data,
@@ -82,10 +86,16 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_SECRET', 'super-secret'),
       }
     )
+
+    const session = await this.sessionService.findById(result.sessionId);
+
+    if (!session)
+      throw new UnauthorizedException();
+
     return result;
   }
 
-  async refreshToken(sessionId: string, data) {
+  async refreshToken(sessionId: string, data, userAgent, host) {
     const session = await this.sessionService.findById(sessionId);
     const { createHash } = await import('node:crypto');
     const hash = createHash('sha256')
@@ -104,7 +114,7 @@ export class AuthService {
     if (user.id !== session.user.id)
       throw new UnauthorizedException();
 
-    await this.sessionService.update(session.id, { hash });
+    await this.sessionService.update(session.id, { hash }, userAgent, host);
 
     const { token, refreshToken, tokenExpires } = await this.getTokensData({
       sessionId: sessionId,

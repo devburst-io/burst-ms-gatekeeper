@@ -18,6 +18,15 @@ export class Session implements SessionInterface {
   @Column()
   hash: string;
 
+  @Column({ nullable: true })
+  ipAddress: string;
+
+  @Column({ nullable: true })
+  ipLocation: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  device: Record<string, any>;
+
   @CreateDateColumn()
   createdAt: Date;
 

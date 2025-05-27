@@ -66,7 +66,7 @@ export class OrganizationService {
     return organization;
   }
 
-  async getUserOrganizations(user: User, page, pageSize) {
+  async getUserOrganizations(user: User, page: number, pageSize: number) {
     const query = this.organizationRepository.createQueryBuilder('organization');
     query
       .leftJoinAndSelect('organization.members', 'members')
