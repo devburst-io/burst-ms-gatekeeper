@@ -105,5 +105,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "optionalDependencies": {
+    "@css-inline/css-inline-linux-arm64-gnu": "^0.14.1"
   }
 }
